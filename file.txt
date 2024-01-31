@@ -1,0 +1,34 @@
+*_p 			80000130 	
+_r 				00000000
+_w 				00000000
+_flags 		0001000a
+_file 		80000130
+_bf
+	*_base 	00000001 
+	_size 	00000000
+_lbfsize 	00000000
+_cookie		800000cc 		
+_read 		00000cb8
+_write 		00000d08
+_seek 		00000d8c
+_close 		00000de4
+_ub
+	*_base 	
+	_size
+*_up
+_ur
+_ubuf[3]
+_nbuf[1]
+_lb
+	*_base
+	_size
+_blksize
+_offset
+
+*_data
+
+_lock
+_mbstate
+_flags2
+
+
