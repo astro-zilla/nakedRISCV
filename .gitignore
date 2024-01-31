@@ -7,10 +7,18 @@
 *.obj
 *.elf
 
+# Compiler asm output (not source asm)
+*main.s
+
 # Linker output
 *.ilk
 *.map
 *.exp
+*.ld
+
+# Deployment output
+*.lss
+*.mem
 
 # Precompiled Headers
 *.gch
@@ -50,3 +58,6 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Jetbrains
+.idea/
