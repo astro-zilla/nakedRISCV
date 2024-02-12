@@ -1,6 +1,6 @@
 
-APPLICATION = hello
-# APPLICATION = nakedshell
+#APPLICATION = hello
+ APPLICATION = nakedshell
 # APPLICATION = coremark
 # APPLICATION = badapple
 # APPLICATION = mandelbrot

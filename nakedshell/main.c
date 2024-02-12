@@ -1,23 +1,24 @@
 #include <stdio.h>
-/** #include <stdio.h> */
-/** #include <string.h> */
-/**  */
-/** int main() { */
-/**   char str[80]; */
-/**   while(1) { */
-/**     putchar('$'); */
-/**     putchar(' '); */
-/**     gets(str); */
-/**     if (!strcmp(str,"exit")) {puts("exiting..."); break;} */
-/**     else if (!strcmp(str, "clear")) {putchar('');} */
-/**     else {puts("command: \""); puts(str); puts("\" not recognised\navailable commands:\n  exit\n  clear");} */
-/**   } */
-/**   return(0); */
-/** } */
+#include <string.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <unistd.h>
+#include <assert.h>
 
 int main() {
-	char* b = "Hello, world!";
-	puts(b);
-	return b[5];
+    setvbuf(stdin, NULL, _IOLBF, BUFSIZ); // set stdin to be unbuffered: required for this hardware
+    char *cd = getcwd(NULL,0);
+    assert(cd!=NULL);
+    char buf[80];
+	while (1) {
+        memset(buf,0,strlen(buf));
+        printf("(%s)$ ",cd);
+        fflush(stdout);
+        fgets(buf,sizeof(buf),stdin);
+
+        if (strcmp(buf,"exit\n")==0) {exit(0);}
+        if (strcmp(buf,"echo\n")==0) {printf("%s",buf);}
+    }
+    exit(errno);
 }
 
