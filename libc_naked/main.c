@@ -11,8 +11,7 @@ volatile struct NAKEDUART *uart = (volatile struct NAKEDUART*)IO_ADDR;
 
 void _exit(int __status) {
 	printf("exit with status: %d\n",__status);
-	asm("ebreak");
-    while(1);
+    __builtin_trap(); // ebreak
 }
 
 void _kill(int pid, int sig) {
@@ -70,11 +69,17 @@ int _open(const char *name, int flags, int mode) {
 
 size_t _read(int __fd, char *__buf, size_t __nbyte){
     int i;
+    uint16_t flags = __sf[__fd]._flags;
+    bool lbf = flags & __SLBF; // is line buffering being used
+    bool nbf = flags & __SNBF; // is no buffering being used
 	switch (__fd) {
 		case STDIN_FILENO: // char mode lbf: read until newline
             for (i=0; i<__nbyte; i++) {
                 while (!uart->UART_CTRL_RX_NEMPTY) { ; }
-                if((*(__buf+i) = uart->UART_DATA_RTX)=='\n'){i++; break;};
+                // if __SNBF is set: read one byte
+                // if __SLBF is set: read up to \n
+                // else: read up to __nbyte bytes
+                if(nbf||(lbf && (*(__buf+i) = uart->UART_DATA_RTX)=='\n')){i++; break;}
             }
 			return i;
 											

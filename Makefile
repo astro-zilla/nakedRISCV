@@ -92,9 +92,9 @@ endif
 DEPS = $(SRCS) $(ASMS) $(OBJS) $(PROJ).ld $(PROJ).lds $(LIBS) $(APPLICATION)/$(APPLICATION).a
 
 ifdef HARVARD
-	TARGETS = $(PROJ).rom.mem $(PROJ).ram.mem
+	TARGETS = logisim/$(PROJ).rom.mem logisim/$(PROJ).ram.mem
 else
-	TARGETS = $(PROJ).mem
+	TARGETS = logisim/$(PROJ).mem
 endif
 
 .PHONY: all
@@ -127,7 +127,7 @@ $(PROJ).o: $(OBJS) $(PROJ).ld $(LIBS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS) -lg_nano -lgcc -lc_naked -lg_nano
 	$(OD) $(ODFLAGS) $@ > $(PROJ).lss
 
-$(PROJ).rom.mem: $(PROJ).o
+logisim/$(PROJ).rom.mem: $(PROJ).o
 	$(OC) $(OCFLAGS) $< $(PROJ).text --only-section .*text* 
 	# hexdump -ve '1/4 "%08x\n"' $(PROJ).text > $@
 	echo 'v3.0 hex bytes little-endian' > $@
@@ -136,7 +136,7 @@ $(PROJ).rom.mem: $(PROJ).o
 	wc -l $@
 	@echo rom ok.
 
-$(PROJ).ram.mem: $(PROJ).o
+logisim/$(PROJ).ram.mem: $(PROJ).o
 	$(OC) $(OCFLAGS) $< $(PROJ).data --only-section .*data* --only-section .*bss*
 	# hexdump -ve '1/4 "%08x\n"' $(PROJ).data > $@
 	@echo 'v3.0 hex bytes little-endian' > $@

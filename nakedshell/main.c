@@ -5,10 +5,10 @@
 #include <unistd.h>
 #include <assert.h>
 
-
 int main() {
-    setvbuf(stdin, NULL, _IOLBF, BUFSIZ); // set stdin to be unbuffered: required for this hardware
-    char *cd = getcwd(NULL,0);
+    setvbuf(stdin, NULL, _IOLBF, BUFSIZ); // set stdin to be line buffered (_read checks for line buffering with a hack)
+//    char *cd = getcwd(NULL,0);
+    char *cd = "/home";
     assert(cd!=NULL);
     char buf[80];
 	while (1) {
@@ -19,6 +19,7 @@ int main() {
 
         if (strcmp(buf,"exit\n")==0) {exit(0);}
         if (strcmp(buf,"echo\n")==0) {printf("%s",buf);}
+        if (strcmp(buf, "abort\n")==0) {abort();}
     }
     exit(errno);
 }
