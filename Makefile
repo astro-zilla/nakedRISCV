@@ -58,8 +58,8 @@ CCFLAGS += -march=$(ARCH) -mabi=$(ABI)
 CCFLAGS += -D__RISCV__ -DBUILD="\"$(BUILD)\"" -DARCH="\"$(ARCH)\"" -DMISSING_SYSCALL_NAMES
 ASFLAGS = -march=$(ARCH)
 LDFLAGS = -T$(PROJ).ld -Map=$(PROJ).map -m elf32lriscv -static -gc-sections --entry=_start 
-LDFLAGS += -L/opt/riscv/riscv32-unknown-elf/lib -L/opt/riscv/lib/gcc/riscv32-unknown-elf/13.2.0 -L$(OS_IFACE) # -Ttext=0 
-LDLIBS  = $(LIBS) 
+LDFLAGS += -L/opt/riscv/riscv32-unknown-elf/lib -L/opt/riscv/lib/gcc/riscv32-unknown-elf/13.2.0 -L$(OS_IFACE) # -Ttext=0
+LDLIBS = -lc_nano -lgcc -lc_naked -lc_nano
 CPFLAGS = -P 
 
 CCFLAGS += -mcmodel=medany -mexplicit-relocs # relocable clode
@@ -99,7 +99,7 @@ endif
 
 .PHONY: all
 
-all: $(TARGETS) $(DEPS)
+all: clean $(OS_IFACE) $(TARGETS) $(DEPS)
 	-echo build is ok for $(TARGETS)
 
 $(APPLICATION)/$(APPLICATION).a:
@@ -111,7 +111,7 @@ $(OS_IFACE)/$(OS_IFACE).a:
 clean:
 	make -C $(APPLICATION) clean
 	make -C $(OS_IFACE) clean
-	-rm -f $(OBJS) $(PROJ).{lss,bin,lst,map,ram,rom,x86,text,data,bin,ld,o,mem,rom.mem,ram.mem} $(PROJ)_uart.bin
+	-rm -f $(OBJS) $(PROJ).{lss,bin,lst,map,ram,rom,x86,text,data,bin,ld,o} $(PROJ)_uart.bin $(TARGETS)
 
 %.o: %.s Makefile
 	$(AS) $(ASFLAGS) -c $< -o $@
@@ -123,14 +123,15 @@ $(PROJ).ld: $(PROJ).lds Makefile
 	$(CPP) $(CPFLAGS) $(PROJ).lds $(PROJ).ld
 	
 $(PROJ).o: $(OBJS) $(PROJ).ld $(LIBS)
-	$(RL) $(LDLIBS)
-	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS) -lg_nano -lgcc -lc_naked -lg_nano
+	$(RL) $(LIBS)
+	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(LIBS) $(LDLIBS)
 	$(OD) $(ODFLAGS) $@ > $(PROJ).lss
 
 logisim/$(PROJ).rom.mem: $(PROJ).o
 	$(OC) $(OCFLAGS) $< $(PROJ).text --only-section .*text* 
 	# hexdump -ve '1/4 "%08x\n"' $(PROJ).text > $@
-	echo 'v3.0 hex bytes little-endian' > $@
+	#cp $(PROJ).text $@
+	echo 'v3.0 hex bytes plain little-endian' > $@
 	xxd -p -c 4 -g 4 $(PROJ).text >> $@
 	rm $(PROJ).text
 	wc -l $@
@@ -139,7 +140,8 @@ logisim/$(PROJ).rom.mem: $(PROJ).o
 logisim/$(PROJ).ram.mem: $(PROJ).o
 	$(OC) $(OCFLAGS) $< $(PROJ).data --only-section .*data* --only-section .*bss*
 	# hexdump -ve '1/4 "%08x\n"' $(PROJ).data > $@
-	@echo 'v3.0 hex bytes little-endian' > $@
+	#cp $(PROJ).data $@
+	echo 'v3.0 hex bytes plain little-endian' > $@
 	xxd -p -c 4 -g 4 $(PROJ).data >> $@
 	rm $(PROJ).data
 	wc -l $@

@@ -20,14 +20,13 @@ _start: 									# kernel designed purely to run "main" then hold
 	#call memset
 
 	la 			sp, _sstack 		# set stack pointer to stack start
+
 	lw 			a0, 0(sp) 			# argc
 	addi 		a1, sp, 4 			# argv
-	li 			a2, 0 					# envp = NULL
-
+	li 			a2, 0 				# envp = NULL
 	call 		main
 
-	mv 			s1, a0 					# main stores retcode in s0
+	mv 			s1, a0 					# main stores retcode in a0
 
-	auipc 	ra, 0
-	ret
+	call        exit
 

@@ -19,6 +19,7 @@
 # Deployment output
 *.lss
 *.mem
+*_ROM_LOADED.circ
 
 # Precompiled Headers
 *.gch

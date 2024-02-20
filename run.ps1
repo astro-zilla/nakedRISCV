@@ -1,0 +1,2 @@
+python ROM_upload.py logisim\RISC_CPU.circ logisim\logisimv.rom.mem -o logisim\RISC_CPU_ROM_LOADED.circ
+java -jar "D:\Program Files\logisim-evolution\app\logisim-evolution-3.8.0-all.jar" -load logisim\logisimv.ram.mem -tty tty,speed,halt logisim\RISC_CPU_ROM_LOADED.circ

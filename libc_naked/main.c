@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include "io.h"
+#include "ANSI_colors.h"
 
 volatile struct NAKEDUART *uart = (volatile struct NAKEDUART*)IO_ADDR;
 
@@ -107,23 +108,24 @@ char *_sbrk(int __inc) {
 	}
 	return base;
 }
+void _uart_out(char *__ptr, int __len) {
+    for (int nbyte=0; nbyte < __len; nbyte++) {
+        uart->UART_DATA_RTX = *__ptr++;
+    }
+}
 
 size_t _write(int __fd, char *__ptr, int __len) {
-    int nbyte;
 	switch (__fd) {
-		case STDOUT_FILENO:
-			for (nbyte=0; nbyte < __len; nbyte++) {
-				uart->UART_DATA_RTX = *__ptr++;
-			}
-			return nbyte;
+        case STDOUT_FILENO:
+			_uart_out(__ptr, __len);
+			return __len;
+        case STDERR_FILENO:
+            _uart_out(RED,sizeof(RED));
+            _uart_out(__ptr, __len);
+            _uart_out(COLOR_RESET, sizeof(COLOR_RESET));
+            return __len;
 		default:
 			return 0;
 	}
 }
-
-//int puts(const char* __c) {
-//	do { uart->UART_DATA_RTX=*__c++; } while (*__c!='\0');
-//    uart->UART_DATA_RTX='\n';
-//    return 0;
-//}
 
